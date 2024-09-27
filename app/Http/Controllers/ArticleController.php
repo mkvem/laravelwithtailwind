@@ -15,7 +15,7 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        $listArticle = Article::query()->where('active', 1)->get();
+        $listArticle = Article::query()->where('active', 1)->paginate(5);
         return view("article/index", [
             'articles' => $listArticle,
         ]);
@@ -108,7 +108,13 @@ class ArticleController extends Controller
      */
     public function destroy(string $id)
     {
-        Article::find($id)->delete();
+        // Article::find($id)->delete();
+        
+        Article::query()->where('id', $id)->update([
+            'active' => 0,
+            'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
+        ]);
+
         FacadesSession::flash('message', 'Artikel berhasil dihapus !');
         FacadesSession::flash('alert-class', 'success');
         return redirect()->route('articles.index');

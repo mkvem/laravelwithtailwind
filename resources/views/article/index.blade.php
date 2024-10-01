@@ -6,29 +6,29 @@
         {{-- Modal --}}
         <div id="comments-modal" class="relative z-10 hidden">
             <!--
-                          Background backdrop, show/hide based on modal state.
-                      
-                          Entering: "ease-out duration-300"
-                            From: "opacity-0"
-                            To: "opacity-100"
-                          Leaving: "ease-in duration-200"
-                            From: "opacity-100"
-                            To: "opacity-0"
-                        -->
+                              Background backdrop, show/hide based on modal state.
+                          
+                              Entering: "ease-out duration-300"
+                                From: "opacity-0"
+                                To: "opacity-100"
+                              Leaving: "ease-in duration-200"
+                                From: "opacity-100"
+                                To: "opacity-0"
+                            -->
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
 
             <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
                 <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                     <!--
-                              Modal panel, show/hide based on modal state.
-                      
-                              Entering: "ease-out duration-300"
-                                From: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                                To: "opacity-100 translate-y-0 sm:scale-100"
-                              Leaving: "ease-in duration-200"
-                                From: "opacity-100 translate-y-0 sm:scale-100"
-                                To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                            -->
+                                  Modal panel, show/hide based on modal state.
+                          
+                                  Entering: "ease-out duration-300"
+                                    From: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                    To: "opacity-100 translate-y-0 sm:scale-100"
+                                  Leaving: "ease-in duration-200"
+                                    From: "opacity-100 translate-y-0 sm:scale-100"
+                                    To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                -->
                     <div
                         class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                         <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
@@ -44,9 +44,8 @@
                                 <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                                     <h3 class="text-base font-semibold leading-6 text-gray-900" id="modal-title">Comments
                                     </h3>
-                                    <div class="mt-2">
-                                        <p class="text-sm text-gray-500">Are you sure you want to deactivate your account?
-                                            All of your data will be permanently removed. This action cannot be undone.</p>
+                                    <div id="comments-section" class="mt-2">
+                                        <!-- Comments dimasukkan disini melalu ajax jquery -->
                                     </div>
                                 </div>
                             </div>
@@ -74,7 +73,7 @@
                 </div>
             @endif
             <a href="{{ route('articles.create') }}">
-                <x-button class="mb-3 inline-flex text-sm" color="cyan">
+                <x-button class="mb-3 inline-flex text-sm" color="white">
                     <svg class="h-6 w-6 me-2 ms-1 text-orange-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M17 14v6m-3-3h6M6 10h2a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2zm10 0h2a2 2 0 002-2V6a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2zM6 20h2a2 2 0 002-2v-2a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2z" />
@@ -113,7 +112,7 @@
 
                     <div class="">
                         <button class="comment-button" type="button" aria-haspopup="dialog" aria-expanded="false"
-                            aria-controls="comments-modal" data-hs-overlay="#comments-modal">
+                            aria-controls="comments-modal" data-hs-overlay="#comments-modal" data-id="{{ $item->id }}">
                             <i class="fa fa-comment" aria-hidden="true"></i>
                             {{ $item->number_of_comments() }}
                         </button>
@@ -129,6 +128,37 @@
     <script type="text/javascript">
         $(document).ready(function() {
             $('.comment-button').on('click', function() {
+                $("#comments-section").html("Loading...");
+                //Call Get Comments API by Article ID
+                var id = $(this).data('id');
+                var url = '{{ url('') }}/comments/' + id;
+                $.ajax({
+                    url: url,
+                    success: function(result) {
+                        console.log(result.data);
+                        var commentsHtml = "";
+                        if (result.data.length == 0) {
+                            commentsHtml =
+                                "<h4 class='text-md text-gray-600 mb-3'>No comments</h4>";
+                        } else {
+                            for (var i = 0; i < result.data.length; i++) {
+                                var comment = result.data[i];
+                                commentsHtml += "<p class='text-sm font-bold'>";
+                                commentsHtml += comment.name;
+                                commentsHtml += "</p>";
+
+                                commentsHtml += "<p class='text-sm py-2'>";
+                                commentsHtml += comment.body;
+                                commentsHtml += "</p>";
+
+                                commentsHtml += "<p class='text-xs pb-3'>";
+                                commentsHtml += comment.created_at;
+                                commentsHtml += "</p>";
+                            }
+                        }
+                        $("#comments-section").html(commentsHtml);
+                    }
+                });
                 $("#comments-modal").show();
             });
 

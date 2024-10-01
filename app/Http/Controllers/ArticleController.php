@@ -15,7 +15,7 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        $listArticle = Article::query()->where('active', 1)->paginate(5);
+        $listArticle = Article::query()->where('active', 1)->orderBy('id', 'desc')->paginate(5);
         return view("article/index", [
             'articles' => $listArticle,
         ]);

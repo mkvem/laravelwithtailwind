@@ -13,7 +13,7 @@ class Comment extends Model
     /**
      * Get the article for this comment
      */
-    public function articles(): BelongsTo {
+    public function article(): BelongsTo {
         return $this->belongsTo(Article::class);
     }
 }

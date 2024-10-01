@@ -15,6 +15,16 @@
                 <p>
                     {!! $article->article !!}
                 </p>
+
+                <h2>Comments</h2>
+                @if ($article->comments->count() == 0)
+                    <h4 class="text-md text-gray-600 mb-3">No comments</h4>
+                @endif
+                @foreach ($article->comments as $item)
+                    <p class="text-sm font-bold">{{ $item->name }}</p>
+                    <p class="text-sm">{{ $item->body }}</p>
+                    <p class="text-xs pb-3">{{ $item->created_at }}</p>
+                @endforeach
             </article>
         </div>
     </div>
